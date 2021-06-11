@@ -4,6 +4,7 @@ import Home from "../views/Home.vue";
 import Client from "../views/Client.vue";
 import Produit from "../views/Produit.vue";
 import Document from "../views/Document.vue";
+import Admin from "../views/Admin.vue";
 
 Vue.use(VueRouter);
 
@@ -27,6 +28,11 @@ const routes = [
     path: "/document",
     name: "Document",
     component: Document,
+  },
+  {
+    path: "/admin",
+    name: "Administration",
+    admin: Admin,
   },
 ];
 
