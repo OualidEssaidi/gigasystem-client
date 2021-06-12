@@ -32,7 +32,7 @@ const routes = [
   {
     path: "/admin",
     name: "Administration",
-    admin: Admin,
+    component: Admin,
   },
 ];
 

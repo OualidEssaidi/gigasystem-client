@@ -41,11 +41,7 @@ export default {
       { icon: "mdi-face", text: "Client", route: "/client" },
       { icon: "mdi-table", text: "Produit", route: "/produit" },
       { icon: "mdi-book", text: "Document", route: "/document" },
-      {
-        icon: "mdi-dashboard",
-        text: "Administration",
-        route: "/admin",
-      },
+      { icon: "mdi-account", text: "Admin", route: "/admin" },
     ],
   }),
 };
