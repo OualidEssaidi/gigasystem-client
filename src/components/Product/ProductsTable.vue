@@ -66,9 +66,7 @@ export default {
     axios
       .get(`http://localhost:9001/microservice-product/product/all`)
       .then((response) => {
-        // JSON responses are automatically parsed.
         this.products = response.data;
-        console.log(response.data);
       })
       .catch((e) => {
         this.errors.push(e);
