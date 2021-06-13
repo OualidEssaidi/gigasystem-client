@@ -1,13 +1,13 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="products"
+    :items="customers"
     sort-by="Ref"
     class="elevation-1"
   >
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>Liste des produits</v-toolbar-title>
+        <v-toolbar-title>Liste des clients</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
@@ -26,40 +26,26 @@
                 <v-row>
                   <v-col cols="12" sm="6" md="6">
                     <v-text-field
-                      v-model="editedItem.designation"
-                      label="Désignation"
+                      v-model="editedItem.name"
+                      label="Nom complet"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="editedItem.categorie"
-                      :items="categories"
-                      item-text="intitule"
-                      item-value="intitule"
-                      label="Catégorie*"
-                      required
-                    ></v-select>
+                    <v-text-field
+                      v-model="editedItem.city"
+                      label="Ville"
+                    ></v-text-field>
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
-                      v-model="editedItem.description"
-                      label="description"
+                      v-model="editedItem.email"
+                      label="Email"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="editedItem.fournisseur"
-                      :items="providers"
-                      item-text="nom"
-                      item-value="nom"
-                      label="Fournisseur"
-                      required
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="6">
                     <v-text-field
-                      v-model="editedItem.prix"
-                      label="Prix"
+                      v-model="editedItem.phone"
+                      label="Téléphone"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -118,40 +104,32 @@ export default {
         sortable: false,
         value: "id",
       },
-      {
-        text: "Categorie",
-        value: "categorie.intitule",
-      },
-      { text: "Designation", value: "designation" },
-      { text: "Description", value: "description" },
-      { text: "Prix HT (Dhs)", value: "prix" },
-      { text: "Fournisseur", value: "fournisseur.nom" },
-      { text: "Actions", value: "actions", sortable: true },
+      { text: "Nom complet", value: "name" },
+      { text: "Vile", value: "city" },
+      { text: "E-mail", value: "email" },
+      { text: "Téléphone", value: "phone" },
+      { text: "Actions", value: "actions", sortable: false },
     ],
-    products: [],
-    categories: [],
-    providers: [],
+    customers: [],
     editedIndex: -1,
-    isToDelete: 0,
+    idToDelete: 0,
     editedItem: {
-      designation: "",
-      description: "",
-      prix: "",
-      fournisseur: "",
-      categorie: "",
+      name: "",
+      city: "",
+      email: "",
+      phone: "",
     },
     defaultItem: {
-      designation: "",
-      description: "",
-      prix: "",
-      fournisseur: "",
-      categorie: "",
+      name: "",
+      city: "",
+      email: "",
+      phone: "",
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nouveau produit" : "Modifier produit";
+      return this.editedIndex === -1 ? "Nouveau client" : "Modifier client";
     },
   },
 
@@ -165,31 +143,15 @@ export default {
   },
 
   created() {
-    this.initialize(),
-      axios
-        .get(`http://localhost:9001/microservice-product/categorie/all`)
-        .then((response) => {
-          this.categories = response.data;
-        })
-        .catch((e) => {
-          this.errors.push(e);
-        });
-    axios
-      .get(`http://localhost:9001/microservice-product/provider/all`)
-      .then((response) => {
-        this.providers = response.data;
-      })
-      .catch((e) => {
-        this.errors.push(e);
-      });
+    this.initialize();
   },
 
   methods: {
     initialize() {
       axios
-        .get(`http://localhost:9001/microservice-product/product/all`)
+        .get(`http://localhost:9001/microservice-customer/all`)
         .then((response) => {
-          this.products = response.data;
+          this.customers = response.data;
         })
         .catch((e) => {
           this.errors.push(e);
@@ -197,23 +159,23 @@ export default {
     },
 
     editItem(item) {
-      this.editedIndex = this.products.indexOf(item);
+      this.editedIndex = this.customers.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.products.indexOf(item);
+      this.editedIndex = this.customers.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      this.isToDelete = this.editedItem.id;
+      this.idToDelete = this.editedItem.id;
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
       axios.delete(
-        `http://localhost:9001/microservice-product/product/delete/${this.isToDelete}`
+        `http://localhost:9001/microservice-customer/delete/${this.idToDelete}`
       );
-      this.products.splice(this.editedIndex, 1);
+      this.customers.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -234,51 +196,25 @@ export default {
     },
 
     save() {
-      var i;
-      for (i = 0; i < this.categories.length; i++) {
-        if (this.categories[i].intitule == this.editedItem.categorie) {
-          this.editedItem.categorie = this.categories[i];
-          break;
-        }
-      }
-      for (i = 0; i < this.providers.length; i++) {
-        if (this.providers[i].nom == this.editedItem.fournisseur) {
-          this.editedItem.fournisseur = this.providers[i];
-          break;
-        }
-      }
       var path;
       if (this.editedIndex > -1) {
-        path = `http://localhost:9001/microservice-product/product/update/${
-          this.products[this.editedIndex].id
-        }/category/${this.editedItem.categorie.id}/provider/${
-          this.editedItem.fournisseur.id
-        }`;
+        path = `http://localhost:9001/microservice-customer/update/${
+          this.customers[this.editedIndex].id}`;
         axios
-          .post(path, {
-            designation: this.editedItem.designation,
-            description: this.editedItem.description,
-            prix: parseFloat(this.editedItem.prix),
-          })
-          .then((response) => {
-            console.log(response.data);
-          })
+          .post(path, this.editedItem)
+          .then(() => {})
           .catch((e) => {
             console.log("erreur");
             this.errors.push(e);
           });
-        Object.assign(this.products[this.editedIndex], this.editedItem);
+        Object.assign(this.customers[this.editedIndex], this.editedItem);
       } else {
-        path = `http://localhost:9001/microservice-product/product/add/category/${this.editedItem.categorie.id}/provider/${this.editedItem.fournisseur.id}`;
+        path = `http://localhost:9001/microservice-customer/add`;
         axios
-          .post(path, {
-            designation: this.editedItem.designation,
-            description: this.editedItem.description,
-            prix: parseFloat(this.editedItem.prix),
-          })
+          .post(path, this.editedItem)
           .then((response) => {
-            this.products.push(response.data);
-            alert("Produit ajouter");
+            this.customers.push(response.data);
+            alert("Client ajouter");
           })
           .catch((e) => {
             console.log("erreur");
