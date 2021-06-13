@@ -1,18 +1,20 @@
+/* eslint-disable */
 <template>
   <v-data-table
     :headers="headers"
-    :items="products"
+    :items="providers"
     sort-by="Ref"
     class="elevation-1"
   >
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>Liste des produits</v-toolbar-title>
+        <v-toolbar-title>Liste des fournisseurs</v-toolbar-title>
         <v-divider class="mx-4" inset vertical></v-divider>
         <v-spacer></v-spacer>
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
+            <v-btn color="primary" rounded dark class="mb-2" v-bind="attrs" v-on="on">
+              <v-icon left> mdi-plus </v-icon>
               Nouveau
             </v-btn>
           </template>
@@ -26,40 +28,26 @@
                 <v-row>
                   <v-col cols="12" sm="6" md="6">
                     <v-text-field
-                      v-model="editedItem.designation"
-                      label="Désignation"
+                      v-model="editedItem.nom"
+                      label="Nom complet"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="editedItem.categorie"
-                      :items="categories"
-                      item-text="intitule"
-                      item-value="intitule"
-                      label="Catégorie*"
-                      required
-                    ></v-select>
+                     <v-text-field
+                      v-model="editedItem.ville"
+                      label="Ville"
+                    ></v-text-field>
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
-                      v-model="editedItem.description"
-                      label="description"
+                      v-model="editedItem.email"
+                      label="Email"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="editedItem.fournisseur"
-                      :items="providers"
-                      item-text="nom"
-                      item-value="nom"
-                      label="Fournisseur"
-                      required
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="6">
                     <v-text-field
-                      v-model="editedItem.prix"
-                      label="Prix"
+                      v-model="editedItem.telephone"
+                      label="Téléphone"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -118,40 +106,32 @@ export default {
         sortable: false,
         value: "id",
       },
-      {
-        text: "Categorie",
-        value: "categorie.intitule",
-      },
-      { text: "Designation", value: "designation" },
-      { text: "Description", value: "description" },
-      { text: "Prix HT (Dhs)", value: "prix" },
-      { text: "Fournisseur", value: "fournisseur.nom" },
-      { text: "Actions", value: "actions", sortable: true },
+      { text: "Nom complet", value: "nom" },
+      { text: "Vile", value: "ville" },
+      { text: "E-mail", value: "email" },
+      { text: "Téléphone", value: "telephone" },
+      { text: "Actions", value: "actions", sortable: false },
     ],
-    products: [],
-    categories: [],
     providers: [],
     editedIndex: -1,
-    isToDelete: 0,
+    idToDelete: 0,
     editedItem: {
-      designation: "",
-      description: "",
-      prix: "",
-      fournisseur: "",
-      categorie: "",
+      nom: "Dell maroc",
+      ville: "Casablanca",
+      email: "contact@dellmaroc.ma",
+      telephone: "0535216974",
     },
     defaultItem: {
-      designation: "",
-      description: "",
-      prix: "",
-      fournisseur: "",
-      categorie: "",
+      nom: "",
+      ville: "",
+      email: "",
+      telephone: "",
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "Nouveau produit" : "Modifier produit";
+      return this.editedIndex === -1 ? "Nouveau Fournisseur" : "Modifier fournisseur";
     },
   },
 
@@ -165,31 +145,15 @@ export default {
   },
 
   created() {
-    this.initialize(),
-      axios
-        .get(`http://localhost:9001/microservice-product/categorie/all`)
-        .then((response) => {
-          this.categories = response.data;
-        })
-        .catch((e) => {
-          this.errors.push(e);
-        });
-    axios
-      .get(`http://localhost:9001/microservice-product/provider/all`)
-      .then((response) => {
-        this.providers = response.data;
-      })
-      .catch((e) => {
-        this.errors.push(e);
-      });
+    this.initialize();
   },
 
   methods: {
     initialize() {
       axios
-        .get(`http://localhost:9001/microservice-product/product/all`)
+        .get(`http://localhost:9001/microservice-product/provider/all`)
         .then((response) => {
-          this.products = response.data;
+          this.providers = response.data;
         })
         .catch((e) => {
           this.errors.push(e);
@@ -197,23 +161,23 @@ export default {
     },
 
     editItem(item) {
-      this.editedIndex = this.products.indexOf(item);
+      this.editedIndex = this.providers.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.products.indexOf(item);
+      this.editedIndex = this.providers.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      this.isToDelete = this.editedItem.id;
+      this.idToDelete = this.editedItem.id;
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
       axios.delete(
-        `http://localhost:9001/microservice-product/product/delete/${this.isToDelete}`
+        `http://localhost:9001/microservice-product/provider/delete/${this.idToDelete}`
       );
-      this.products.splice(this.editedIndex, 1);
+      this.providers.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -234,51 +198,25 @@ export default {
     },
 
     save() {
-      var i;
-      for (i = 0; i < this.categories.length; i++) {
-        if (this.categories[i].intitule == this.editedItem.categorie) {
-          this.editedItem.categorie = this.categories[i];
-          break;
-        }
-      }
-      for (i = 0; i < this.providers.length; i++) {
-        if (this.providers[i].nom == this.editedItem.fournisseur) {
-          this.editedItem.fournisseur = this.providers[i];
-          break;
-        }
-      }
       var path;
       if (this.editedIndex > -1) {
-        path = `http://localhost:9001/microservice-product/product/update/${
-          this.products[this.editedIndex].id
-        }/category/${this.editedItem.categorie.id}/provider/${
-          this.editedItem.fournisseur.id
-        }`;
+        path = `http://localhost:9001/microservice-product/provider/update/${this.providers[this.editedIndex].id}`;
         axios
-          .post(path, {
-            designation: this.editedItem.designation,
-            description: this.editedItem.description,
-            prix: parseFloat(this.editedItem.prix),
-          })
-          .then((response) => {
-            console.log(response.data);
+          .post(path, this.editedItem)
+          .then(() => {
+            alert("Fournisseur modifier");
           })
           .catch((e) => {
             console.log("erreur");
             this.errors.push(e);
           });
-        Object.assign(this.products[this.editedIndex], this.editedItem);
+        Object.assign(this.providers[this.editedIndex], this.editedItem);
       } else {
-        path = `http://localhost:9001/microservice-product/product/add/category/${this.editedItem.categorie.id}/provider/${this.editedItem.fournisseur.id}`;
+        path = `http://localhost:9001/microservice-product/provider/add`;
         axios
-          .post(path, {
-            designation: this.editedItem.designation,
-            description: this.editedItem.description,
-            prix: parseFloat(this.editedItem.prix),
-          })
+          .post(path, this.editedItem)
           .then((response) => {
-            this.products.push(response.data);
-            alert("Produit ajouter");
+            this.providers.push(response.data);
           })
           .catch((e) => {
             console.log("erreur");
