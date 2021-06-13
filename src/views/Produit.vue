@@ -1,21 +1,16 @@
 <template>
   <div class="pa-md-4">
-    <div class="pa-md-4">
-      <AddProduct />
-    </div>
-    <ProductsTable />
+    <Table />
   </div>
 </template>
 <script>
-import ProductsTable from "../components/Product/ProductsTable.vue";
-import AddProduct from "../components/Product/AddProduct.vue";
+import Table from "../components/Product/Table.vue";
 
 export default {
   name: "Admin page",
 
   components: {
-    ProductsTable,
-    AddProduct,
+    Table,
   },
 };
 </script>
